@@ -1,3 +1,9 @@
+### 2026.529.1137
+
+- Auto-generate accurate release notes from git log
+
+----------
+
 - [Fix potentially residual user styles when previewing custom filters](https://github.com/gorhill/uBlock/commit/cc56504273)
 - [Fix various quirks when previewing custom filters at creation time](https://github.com/gorhill/uBlock/commit/90e8212304)
 - Updated filter lists
