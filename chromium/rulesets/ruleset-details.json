@@ -20,8 +20,8 @@
   },
   "css": {
    "generic": 672,
-   "specific": 4446,
-   "procedural": 1688
+   "specific": 4447,
+   "procedural": 1689
   },
   "popups": 135
  },
@@ -82,8 +82,8 @@
   "homeURL": "https://pgl.yoyo.org/adservers/",
   "filters": {
    "total": 3508,
-   "accepted": 3428,
-   "rejected": 80
+   "accepted": 3429,
+   "rejected": 79
   },
   "rules": {
    "total": 1,
@@ -130,8 +130,8 @@
   "enabled": true,
   "homeURL": "https://gitlab.com/malware-filter/urlhaus-filter",
   "filters": {
-   "total": 16925,
-   "accepted": 16925,
+   "total": 16934,
+   "accepted": 16934,
    "rejected": 0
   },
   "rules": {

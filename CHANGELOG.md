@@ -1,3 +1,9 @@
+### 2026.529.1249
+
+- Updated uBlock filter lists and submodule
+
+----------
+
 ### 2026.529.1137
 
 - Auto-generate accurate release notes from git log

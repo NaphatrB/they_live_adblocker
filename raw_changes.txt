@@ -1,1 +1,1 @@
-- Auto-generate accurate release notes from git log
+- Updated uBlock filter lists and submodule
