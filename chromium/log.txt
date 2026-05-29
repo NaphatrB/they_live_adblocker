@@ -1,5 +1,5 @@
-Secret: 4d7dced9499f19fe
-Version: 2026.529.1319
+Secret: e7602a8da468f1fa
+Version: 2026.529.1333
 ============================
 Listset for 'ublock-filters':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/quick-fixes.min.txt
@@ -7,11 +7,11 @@ Listset for 'ublock-filters':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/filters.min.txt
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/privacy.min.txt
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/ubol-filters.txt
-Input filter count: 10116
-	Accepted filter count: 10094
+Input filter count: 10114
+	Accepted filter count: 10092
 	Rejected filter count: 1
-Output rule count: 5708
-	Static rules: 5308
+Output rule count: 5706
+	Static rules: 5306
 		Salvaged rule by ignoring 1 unsupported domain= option: erotic-beauties.com|hardsex.cc|rule34.top|sex-movies.biz|tube18.sexy|xvideos.name|booru.*
 		Salvaged rule by ignoring 1 unsupported domain= option: 8boobs.com|angelgals.com|babesexy.com|babesinporn.com|fooxybabes.com|hotbabeswanted.com|hotstunners.com|mainbabes.com|nakedbabes.club|nakedgirlsroom.com|nudebabes.sexy|pleasuregirl.net|rabbitsfun.com|sexybabes.club|sexybabesart.com|wantedbabes.com|silkengirl.*
 		Salvaged rule by ignoring 1 unsupported domain= option: web.de|gmx.*
@@ -647,11 +647,11 @@ CSS-procedural: 24 distinct filters for 19 distinct hostnames
 ============================
 Listset for 'ind-0':
 	Fetching remote https://easylist-downloads.adblockplus.org/indianlist.txt
-Input filter count: 5202
-	Accepted filter count: 5202
+Input filter count: 5203
+	Accepted filter count: 5203
 	Rejected filter count: 0
-Output rule count: 5160
-	Static rules: 5160
+Output rule count: 5161
+	Static rules: 5161
 
 	Maybe good (regexes): 0
 	urlskip=: 0
@@ -660,7 +660,7 @@ Output rule count: 5160
 CSS-generic-low: 0 plain CSS selectors
 CSS-generic-high: 0 plain CSS selectors
 CSS-generic: 7 specific CSS exceptions
-CSS-specific: 4834 distinct filters for 5800 distinct hostnames
+CSS-specific: 4833 distinct filters for 5800 distinct hostnames
 CSS-procedural: 137 distinct filters for 141 distinct hostnames
 ============================
 Listset for 'irn-0':
@@ -670,8 +670,8 @@ Listset for 'irn-0':
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerTrackers.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerCensor.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerHalfPrice.txt
-	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerMalware.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerPhishing.txt
+	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerMalware.txt
 Input filter count: 1349
 	Accepted filter count: 1322
 	Rejected filter count: 1

@@ -1,3 +1,9 @@
+### 2026.529.1333
+
+- test: add Playwright E2E tests for They Live extension
+
+----------
+
 ### 2026.529.1319
 
 - test: add unit tests for They Live classification logic

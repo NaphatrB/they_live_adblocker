@@ -6,13 +6,13 @@
   "enabled": true,
   "homeURL": "https://github.com/uBlockOrigin/uAssets",
   "filters": {
-   "total": 10116,
-   "accepted": 10094,
+   "total": 10114,
+   "accepted": 10092,
    "rejected": 1
   },
   "rules": {
-   "total": 5495,
-   "plain": 5308,
+   "total": 5493,
+   "plain": 5306,
    "regex": 187,
    "strictblock": 34,
    "urlskip": 212,
@@ -805,13 +805,13 @@
   "tags": "ads assamese bengali gujarati hindi kannada malayalam marathi nepali punjabi sinhala tamil telugu",
   "homeURL": "https://github.com/mediumkreation/IndianList",
   "filters": {
-   "total": 5202,
-   "accepted": 5202,
+   "total": 5203,
+   "accepted": 5203,
    "rejected": 0
   },
   "rules": {
-   "total": 5160,
-   "plain": 5160,
+   "total": 5161,
+   "plain": 5161,
    "regex": 0,
    "rejected": 0
   },
