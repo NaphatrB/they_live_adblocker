@@ -1,5 +1,5 @@
-Secret: b234c23a22d04925
-Version: 2026.529.1110
+Secret: 506cd3281ea93076
+Version: 2026.529.1112
 ============================
 Listset for 'ublock-filters':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/quick-fixes.min.txt
