@@ -1,5 +1,5 @@
-Secret: c66a4f53cf6363f0
-Version: 2026.529.1249
+Secret: 567ce79eda371d55
+Version: 2026.529.1255
 ============================
 Listset for 'ublock-filters':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/quick-fixes.min.txt
@@ -665,8 +665,8 @@ CSS-procedural: 137 distinct filters for 141 distinct hostnames
 ============================
 Listset for 'irn-0':
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlocker.txt
-	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlocker-Deprecated.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerAds.txt
+	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlocker-Deprecated.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerTrackers.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerCensor.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerHalfPrice.txt
