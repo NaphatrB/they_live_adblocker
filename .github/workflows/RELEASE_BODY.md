@@ -1,18 +1,19 @@
-**uBO Lite** (uBOL), an [MV3 API-based](https://developer.chrome.com/docs/extensions/mv3/intro/) content blocker.
+**They Live Adblocker** — uBO Lite fork that replaces ads with slogans from John Carpenter's 1988 film.
 
-- [Synopsis](https://github.com/uBlockOrigin/uBOL-issues#readme)
-- [Documentation](https://github.com/uBlockOrigin/uBOL-home/wiki)
+- [Source code](https://github.com/NaphatrB/they_live_adblocker)
+- [uBlock submodule (They Live branch)](https://github.com/NaphatrB/uBlock/tree/they-live-llm)
 
-## Release notes
+## What's new in %tag%
 
 %changelog%
-- [Commit history](https://github.com/uBlockOrigin/uBOL-home/commits/%tag%)
+
+- [Full commit history](https://github.com/NaphatrB/they_live_adblocker/commits/%tag%)
 
 ## Installation
 
-When a new release is created, there is a delay before it becomes available in the various platform stores due to their respective review process. This is normal, please do not open issues about these delays.
+Load unpacked from the `chromium/` directory, or use the zip below:
 
-- Chromium-based browsers: Install from [Chrome Web Store](https://chrome.google.com/webstore/detail/ddkjiahejlhfcafbddmgiahcphecmpfh)
-- Firefox: Click [uBOLite_%tag%.firefox.signed.xpi](https://github.com/uBlockOrigin/uBOL-home/releases/download/%tag%/uBOLite_%tag%.firefox.signed.xpi)
-- Microsoft Edge: Install from [Edge Add-ons store](https://microsoftedge.microsoft.com/addons/detail/ublock-origin-lite/cimighlppcgcoapaliogpjjdehbnofhn)
-- Safari: Install from [App Store](https://apps.apple.com/us/app/ublock-origin-lite/id6745342698)
+- **Chrome / Brave / Edge** — download `uBOLite_%tag%.chromium.zip`, unzip, go to `chrome://extensions`, enable Developer mode, click **Load unpacked**, select the unzipped folder.
+- **Firefox** — download `uBOLite_%tag%.firefox.xpi`, open `about:addons`, click the gear icon → **Install Add-on From File**.
+
+> AI classification (optional): enable in the extension settings with any OpenAI-compatible endpoint (Ollama local, ollama.com cloud, OpenAI, Groq, etc.).

@@ -28,6 +28,8 @@ jobs:
         with:
           persist-credentials: false
           submodules: recursive
+          fetch-depth: 0
+          fetch-tags: true
       - name: Locate uBO repo
         run: |
           UBOL_REPO_DIR=$(pwd)
@@ -81,18 +83,46 @@ jobs:
           tools/make-mv3.sh safari ${{ env.TAGNAME }}
           echo "SAFARI_PACKAGE=uBOLite_${{ env.TAGNAME }}.safari.zip" >> $GITHUB_ENV
           cd - > /dev/null
-      - name: Commit uBOLite MV3 package files
+      - name: Assemble release text and update CHANGELOG
+        run: |
+          # Find the previous tag; fall back to first commit if none exists.
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)
+
+          # Build changelog from commits since last tag, skipping workflow/bot commits.
+          git log "${PREV_TAG}..HEAD" \
+            --pretty=format:"- %s" \
+            --no-merges \
+          | grep -v '^\- \[workflow\]' \
+          | grep -v '^\- Bump uBlock' \
+          > raw_changes.txt || true
+
+          # If no meaningful commits, fall back to a generic note.
+          if [ ! -s raw_changes.txt ]; then
+            echo "- Updated uBlock filter lists and submodule" > raw_changes.txt
+          fi
+
+          # Prepend the new entry to CHANGELOG.md so it accumulates over time.
+          {
+            echo "### ${{ env.TAGNAME }}"
+            echo ""
+            cat raw_changes.txt
+            echo ""
+            echo "----------"
+            echo ""
+            cat CHANGELOG.md
+          } > CHANGELOG_new.md
+          mv CHANGELOG_new.md CHANGELOG.md
+
+          # Build the release body from the template.
+          sed -e 's/%tag%/${{ env.TAGNAME }}/g' .github/workflows/RELEASE_BODY.md > release_body0.txt
+          sed -e '/%changelog%/{r raw_changes.txt' -e 'd}' release_body0.txt > release_body.txt
+
+      - name: Commit uBOLite MV3 package files and CHANGELOG
         # https://github.com/marketplace/actions/github-action-for-committing-changes-to-a-repository
         uses: devops-infra/action-commit-push@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           commit_message: "[workflow] Update uBOLite MV3 package files for ${{ env.TAGNAME }}"
-      - name: Assemble release text
-        run: |
-          sed -e 's/%tag%/${{ env.TAGNAME }}/g' .github/workflows/RELEASE_BODY.md > release_body0.txt
-          grep -m1 -B10000 -- "----------" CHANGELOG.md | head -n -2 > release_notes.txt
-          sed -e '/%changelog%/{r release_notes.txt' -e 'd}' release_body0.txt > release_body.txt
-
       - name: Create GitHub release
         id: create_release
         env:
