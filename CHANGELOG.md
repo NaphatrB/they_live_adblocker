@@ -1,3 +1,9 @@
+### 2026.529.1319
+
+- test: add unit tests for They Live classification logic
+
+----------
+
 ### 2026.529.1255
 
 - Updated uBlock filter lists and submodule
