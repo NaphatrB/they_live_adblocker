@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint --no-warn-ignored -- \"./docs/tests/*.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test docs/tests/they-live-classify.js"
   },
   "repository": {
     "type": "git",
