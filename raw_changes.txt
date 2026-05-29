@@ -1,1 +1,1 @@
-- chore: bump uBlock submodule to prompt v5 (therapy→SLEEP fix)
+- feat: expand local fast-path rules + 42 new unit tests (91 total)

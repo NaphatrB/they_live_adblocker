@@ -1,3 +1,9 @@
+### 2026.529.1432
+
+- feat: expand local fast-path rules + 42 new unit tests (91 total)
+
+----------
+
 ### 2026.529.1415
 
 - chore: bump uBlock submodule to prompt v5 (therapy→SLEEP fix)
