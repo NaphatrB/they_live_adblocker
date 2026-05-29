@@ -4,7 +4,9 @@
 
 A fork of [uBlock Origin Lite](https://github.com/uBlockOrigin/uBOL-home) that, instead of *hiding* cosmetically-blocked ads, **replaces** them with white tiles bearing slogans from John Carpenter's 1988 film *They Live*: **OBEY**, **CONSUME**, **WATCH TV**, **SLEEP**, **SUBMIT**, **CONFORM**, **STAY ASLEEP**, **BUY**, **WORK**, **NO INDEPENDENT THOUGHT**, **DO NOT QUESTION AUTHORITY**.
 
-Each blocked ad gets a single phrase, picked at random from the list.
+Each blocked ad gets a single phrase, picked at random from the list — or, with the optional AI classification feature enabled, chosen to match the ad's actual content using an LLM.
+
+**Hover** over any tile to peek at the original ad underneath; move the mouse away to restore the slogan.
 
 The idea is from a blog post I wrote in 2015 (and never got around to building): [_They Live adblock mode_](https://proceduralgraphics.blogspot.com/2015/04/they-live-adblock-mode.html).
 
@@ -12,6 +14,32 @@ The idea is from a blog post I wrote in 2015 (and never got around to building):
 
 <img width="395" height="399" alt="reddit_screenshot" src="https://github.com/user-attachments/assets/908b6602-078a-4d78-abc0-9ca13e22d62e" />
 
+
+## AI-powered classification (optional)
+
+By default each ad tile gets a random slogan. Enable the **They Live AI** feature in the dashboard to have an LLM read the ad's surrounding context (element class names, nearby text, `alt` attributes, etc.) and pick a more fitting phrase — e.g. a car ad gets **CONSUME**, a political piece gets **DO NOT QUESTION AUTHORITY**.
+
+Calls are batched in ~250 ms windows. A random phrase is shown immediately while the LLM response is in flight, then swapped when it arrives.
+
+### Using Ollama Cloud (no local install needed)
+
+1. Create a free account at [ollama.com](https://ollama.com) and generate an API key.
+2. Open the extension dashboard → **They Live AI** section.
+3. Check **Enable AI classification**.
+4. Leave the URL as `https://ollama.com`, model as `gemma4:31b-cloud`, and paste your API key.
+5. Click **Save**.
+
+### Using a local Ollama instance
+
+If you have [Ollama](https://ollama.com/download) installed locally, set the URL to `http://localhost:11434` and choose any model you have pulled (e.g. `gemma3:4b`). Leave the API key blank.
+
+---
+
+## Hover to peek
+
+Move your mouse over any OBEY / CONSUME tile to temporarily reveal the original ad content beneath. Moving the mouse away restores the slogan tile. No clicks needed — it's purely CSS.
+
+---
 
 ## Install
 
@@ -46,13 +74,20 @@ The packaged extension lands in `uBlock/dist/build/uBOLite.chromium/` — load i
 
 ## How it works
 
-uBO Lite's cosmetic filtering normally injects CSS like `selector { display: none !important }` to hide matched ad elements. This fork patches those injection sites to instead apply a white-box mask with a `::after` overlay whose `content` is read from a `data-ubol-they-live` attribute, then walks the DOM (with a MutationObserver for late-loaded ads) to tag each matched element with a random phrase from the list.
+uBO Lite's cosmetic filtering normally injects CSS like `selector { display: none !important }` to hide matched ad elements. This fork patches those injection sites to instead apply a white-box mask with a `::after` overlay whose `content` is read from a `data-ubol-they-live` attribute, then walks the DOM (with a MutationObserver for late-loaded ads) to tag each matched element with a phrase.
 
-Touched files in the [`davmlaw/uBlock`](https://github.com/davmlaw/uBlock/tree/they-live) submodule:
+On hover the `::after` overlay is hidden and the element background becomes transparent, revealing the original ad content that was always in the DOM beneath.
 
-- `platform/mv3/extension/js/scripting/they-live.js` *(new)* — phrase list, CSS generator, DOM tagging
+When AI classification is enabled, element context (class names, nearby text, `alt` attributes) is batched and sent to an Ollama-compatible API endpoint; the returned phrase replaces the initial random one once the response arrives.
+
+Touched files in the [`davmlaw/uBlock`](https://github.com/davmlaw/uBlock/tree/they-live-llm) submodule:
+
+- `platform/mv3/extension/js/scripting/they-live.js` *(new)* — phrase list, CSS generator (including hover rules), DOM tagging, LLM batch queue
 - `platform/mv3/extension/js/scripting/css-{specific,generic,procedural-api}.js` — call sites
 - `platform/mv3/extension/js/scripting-manager.js` — registers `they-live.js` ahead of consumers
+- `platform/mv3/extension/js/background.js` — Ollama API fetch handler + settings message handlers
+- `platform/mv3/extension/dashboard.html` — They Live AI settings UI
+- `platform/mv3/extension/js/settings.js` — loads/saves Ollama config
 
 ## Caveats
 
