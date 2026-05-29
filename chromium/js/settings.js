@@ -232,6 +232,82 @@ dom.on('section[data-pane="settings"] [data-i18n="resetToDefaultButton"]', 'clic
 });
 
 /******************************************************************************/
+// They Live — AI classification settings
+
+{
+    const enabledEl = document.querySelector('#theyLiveEnabled');
+    const urlEl = document.querySelector('#theyLiveOllamaUrl');
+    const modelEl = document.querySelector('#theyLiveOllamaModel');
+    const apiKeyEl = document.querySelector('#theyLiveOllamaApiKey');
+    const thinkingEl = document.querySelector('#theyLiveThinking');
+    const saveBtn = document.querySelector('#theyLiveSave');
+    const testBtn = document.querySelector('#theyLiveTest');
+    const statusEl = document.querySelector('#theyLiveSaveStatus');
+    const fieldsEl = document.querySelector('#theyLiveOllamaFields');
+
+    const refreshFieldVisibility = () => {
+        if ( fieldsEl ) {
+            fieldsEl.style.display = enabledEl?.checked ? '' : 'none';
+        }
+    };
+
+    if ( enabledEl ) {
+        enabledEl.addEventListener('change', refreshFieldVisibility);
+    }
+
+    if ( testBtn ) {
+        testBtn.addEventListener('click', () => {
+            if ( statusEl ) { statusEl.textContent = '⏳ Testing…'; }
+            testBtn.disabled = true;
+            sendMessage({
+                what: 'theyLiveTest',
+                ollamaUrl: urlEl?.value.trim() || 'https://ollama.com',
+                ollamaModel: modelEl?.value.trim() || 'gemma4:31b-cloud',
+                ollamaApiKey: apiKeyEl?.value || '',
+                ollamaThinking: thinkingEl?.checked || false,
+            }).then(result => {
+                testBtn.disabled = false;
+                if ( !statusEl ) { return; }
+                if ( result?.ok ) {
+                    statusEl.textContent = `✓ Connected — got: "${result.label}"`;
+                } else {
+                    statusEl.textContent = `✗ Failed: ${result?.error || 'unknown error'}`;
+                }
+                setTimeout(() => { statusEl.textContent = ''; }, 6000);
+            });
+        });
+    }
+
+    if ( saveBtn ) {
+        saveBtn.addEventListener('click', () => {
+            sendMessage({
+                what: 'setTheyLiveSettings',
+                ollamaEnabled: enabledEl?.checked || false,
+                ollamaUrl: urlEl?.value.trim() || 'https://ollama.com',
+                ollamaModel: modelEl?.value.trim() || 'gemma4:31b-cloud',
+                ollamaApiKey: apiKeyEl?.value || '',
+                ollamaThinking: thinkingEl?.checked || false,
+            }).then(() => {
+                if ( statusEl ) {
+                    statusEl.textContent = '✓ Saved';
+                    setTimeout(() => { statusEl.textContent = ''; }, 2000);
+                }
+            });
+        });
+    }
+
+    sendMessage({ what: 'getTheyLiveSettings' }).then(data => {
+        if ( !data ) { return; }
+        if ( enabledEl ) { enabledEl.checked = Boolean(data.ollamaEnabled); }
+        if ( urlEl ) { urlEl.value = data.ollamaUrl || 'https://ollama.com'; }
+        if ( modelEl ) { modelEl.value = data.ollamaModel || 'gemma4:31b-cloud'; }
+        if ( apiKeyEl ) { apiKeyEl.value = data.ollamaApiKey || ''; }
+        if ( thinkingEl ) { thinkingEl.checked = Boolean(data.ollamaThinking); }
+        refreshFieldVisibility();
+    });
+}
+
+/******************************************************************************/
 
 function listen() {
     const bc = new self.BroadcastChannel('uBOL');

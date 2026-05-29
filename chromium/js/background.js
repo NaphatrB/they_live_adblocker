@@ -220,6 +220,88 @@ function setDeveloperMode(state) {
 }
 
 /******************************************************************************/
+// They Live — LLM ad classification via Ollama
+
+const THEY_LIVE_PHRASES = [
+    'OBEY', 'CONSUME', 'WATCH TV', 'SLEEP', 'NO INDEPENDENT THOUGHT',
+    'SUBMIT', 'CONFORM', 'STAY ASLEEP', 'BUY', 'WORK', 'DO NOT QUESTION AUTHORITY',
+];
+
+async function theyLiveClassify(contexts) {
+    if ( contexts.length === 0 ) { return []; }
+
+    const [enabled, url, model, apiKey, thinking] = await Promise.all([
+        localRead('theyLive.ollamaEnabled'),
+        localRead('theyLive.ollamaUrl'),
+        localRead('theyLive.ollamaModel'),
+        localRead('theyLive.ollamaApiKey'),
+        localRead('theyLive.ollamaThinking'),
+    ]);
+    if ( !enabled ) { return []; }
+
+    const ollamaUrl = (url || 'https://ollama.com').replace(/\/$/, '');
+    const ollamaModel = model || 'gemma4:31b-cloud';
+
+    const adLines = contexts.map((ctx, i) => `Ad ${i + 1}: ${ctx}`).join('\n');
+    const phraseList = THEY_LIVE_PHRASES.join(', ');
+    const prompt =
+        `You are classifying advertisements for satirical effect.\n` +
+        `Choose the single most fitting label for each ad from this list:\n` +
+        `${phraseList}\n\n` +
+        `Hints:\n` +
+        `- products/retail/shopping → CONSUME or BUY\n` +
+        `- entertainment/streaming/games → WATCH TV or SLEEP\n` +
+        `- finance/insurance/banking → WORK or OBEY\n` +
+        `- news/politics/media → NO INDEPENDENT THOUGHT or DO NOT QUESTION AUTHORITY\n` +
+        `- social/apps/tech → CONFORM or SUBMIT\n` +
+        `- unclear → OBEY\n\n` +
+        `${adLines}\n\n` +
+        `Reply with exactly ${contexts.length} line(s), one label per line, in order. ` +
+        `Use exact labels from the list only, no other text.`;
+
+    const headers = { 'Content-Type': 'application/json' };
+    if ( apiKey ) { headers['Authorization'] = `Bearer ${apiKey}`; }
+
+    let response;
+    try {
+        response = await fetch(`${ollamaUrl}/api/chat`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                model: ollamaModel,
+                messages: [{ role: 'user', content: prompt }],
+                stream: false,
+                ...(thinking ? { think: true } : {}),
+            }),
+            signal: AbortSignal.timeout(15000),
+        });
+    } catch(reason) {
+        ubolErr(`theyLiveClassify/fetch/${reason}`);
+        return [];
+    }
+
+    if ( !response.ok ) {
+        ubolErr(`theyLiveClassify/http/${response.status}`);
+        return [];
+    }
+
+    let data;
+    try {
+        data = await response.json();
+    } catch(reason) {
+        ubolErr(`theyLiveClassify/json/${reason}`);
+        return [];
+    }
+
+    const content = data.message?.content || '';
+    const lines = content.trim().split('\n').map(l => l.trim().toUpperCase());
+    return contexts.map((_, i) => {
+        const candidate = lines[i] || '';
+        return THEY_LIVE_PHRASES.includes(candidate) ? candidate : '';
+    });
+}
+
+/******************************************************************************/
 
 function onMessage(request, sender, callback) {
 
@@ -261,6 +343,80 @@ function onMessage(request, sender, callback) {
             toggleToolbarIcon(tabId);
         }
         return false;
+    }
+
+    case 'theyLiveClassify': {
+        theyLiveClassify(request.contexts || []).then(phrases => {
+            callback(phrases);
+        }).catch(() => {
+            callback([]);
+        });
+        return true;
+    }
+
+    case 'getTheyLiveSettings': {
+        Promise.all([
+            localRead('theyLive.ollamaEnabled'),
+            localRead('theyLive.ollamaUrl'),
+            localRead('theyLive.ollamaModel'),
+            localRead('theyLive.ollamaApiKey'),
+            localRead('theyLive.ollamaThinking'),
+        ]).then(([enabled, url, model, apiKey, thinking]) => {
+            callback({
+                ollamaEnabled: Boolean(enabled),
+                ollamaUrl: url || 'https://ollama.com',
+                ollamaModel: model || 'gemma4:31b-cloud',
+                ollamaApiKey: apiKey || '',
+                ollamaThinking: Boolean(thinking),
+            });
+        });
+        return true;
+    }
+
+    case 'setTheyLiveSettings': {
+        const { ollamaEnabled, ollamaUrl, ollamaModel, ollamaApiKey, ollamaThinking } = request;
+        Promise.all([
+            localWrite('theyLive.ollamaEnabled', Boolean(ollamaEnabled)),
+            localWrite('theyLive.ollamaUrl', ollamaUrl || 'https://ollama.com'),
+            localWrite('theyLive.ollamaModel', ollamaModel || 'gemma4:31b-cloud'),
+            localWrite('theyLive.ollamaApiKey', ollamaApiKey || ''),
+            localWrite('theyLive.ollamaThinking', Boolean(ollamaThinking)),
+        ]).then(() => { callback(); });
+        return true;
+    }
+
+    case 'theyLiveTest': {
+        const { ollamaUrl, ollamaModel, ollamaApiKey, ollamaThinking } = request;
+        const testUrl = (ollamaUrl || 'https://ollama.com').replace(/\/$/, '');
+        const testModel = ollamaModel || 'gemma4:31b-cloud';
+        const headers = { 'Content-Type': 'application/json' };
+        if ( ollamaApiKey ) { headers['Authorization'] = `Bearer ${ollamaApiKey}`; }
+        fetch(`${testUrl}/api/chat`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                model: testModel,
+                messages: [{ role: 'user', content:
+                    'Classify this ad as one of: OBEY, CONSUME, WATCH TV, SLEEP, ' +
+                    'NO INDEPENDENT THOUGHT, SUBMIT, CONFORM, STAY ASLEEP, BUY, WORK, ' +
+                    'DO NOT QUESTION AUTHORITY.\nAd: "buy cheap car insurance now"\n' +
+                    'Reply with one label only.' }],
+                stream: false,
+                ...(ollamaThinking ? { think: true } : {}),
+            }),
+            signal: AbortSignal.timeout(15000),
+        }).then(async res => {
+            if ( !res.ok ) {
+                callback({ ok: false, error: `HTTP ${res.status}` });
+                return;
+            }
+            const data = await res.json();
+            const label = (data.message?.content || '').trim();
+            callback({ ok: true, label });
+        }).catch(err => {
+            callback({ ok: false, error: String(err) });
+        });
+        return true;
     }
 
     case 'startCustomFilters':

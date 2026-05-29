@@ -323,6 +323,18 @@
   ]
  },
  {
+  "re": "^[^:]+://(?:[^/]+\\.)?ay\\.live/st/.*?(?:[^%.0-9a-z_-]|$)url=http",
+  "steps": [
+   "?url"
+  ]
+ },
+ {
+  "re": "^[^:]+://(?:[^/]+\\.)?cekpaste\\.id/url\\.php.*?(?:[^%.0-9a-z_-]|$)url=http",
+  "steps": [
+   "?url"
+  ]
+ },
+ {
   "re": "^[^:]+://(?:[^/]+\\.)?rd\\.remove\\.bg/cl0/http",
   "steps": [
    "/\\/CL0\\/(http.*?)\\/\\d\\/[a-f0-9-]+\\//",
@@ -1304,6 +1316,19 @@
   "re": "^[^:]+://(?:[^/]+\\.)?donanimhaber\\.com/externallinkredirect\\?.*?(?:[^%.0-9a-z_-]|$)url=http",
   "steps": [
    "?url"
+  ]
+ },
+ {
+  "re": "^[^:]+://(?:[^/]+\\.)?api2\\.zoomit\\.ir/catalog/store-links/.*?/click\\?url=",
+  "steps": [
+   "?url"
+  ]
+ },
+ {
+  "re": "^[^:]+://(?:[^/]+\\.)?offerdaily\\.ir/external(?:[^%.0-9a-z_-]|$)",
+  "steps": [
+   "/\\/external\\/(.*)/",
+   "-base64"
   ]
  },
  {
