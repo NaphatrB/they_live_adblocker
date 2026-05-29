@@ -1,3 +1,9 @@
+### 2026.529.1347
+
+- Updated uBlock filter lists and submodule
+
+----------
+
 ### 2026.529.1333
 
 - test: add Playwright E2E tests for They Live extension

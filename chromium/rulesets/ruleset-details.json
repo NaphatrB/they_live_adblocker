@@ -805,19 +805,19 @@
   "tags": "ads assamese bengali gujarati hindi kannada malayalam marathi nepali punjabi sinhala tamil telugu",
   "homeURL": "https://github.com/mediumkreation/IndianList",
   "filters": {
-   "total": 5203,
-   "accepted": 5203,
+   "total": 5204,
+   "accepted": 5204,
    "rejected": 0
   },
   "rules": {
-   "total": 5161,
-   "plain": 5161,
+   "total": 5162,
+   "plain": 5162,
    "regex": 0,
    "rejected": 0
   },
   "css": {
    "generic": 7,
-   "specific": 5800,
+   "specific": 5802,
    "procedural": 141
   },
   "popups": 2

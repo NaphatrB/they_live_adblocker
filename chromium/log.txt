@@ -1,5 +1,5 @@
-Secret: e7602a8da468f1fa
-Version: 2026.529.1333
+Secret: 8eb4f4140012478e
+Version: 2026.529.1347
 ============================
 Listset for 'ublock-filters':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/quick-fixes.min.txt
@@ -647,11 +647,11 @@ CSS-procedural: 24 distinct filters for 19 distinct hostnames
 ============================
 Listset for 'ind-0':
 	Fetching remote https://easylist-downloads.adblockplus.org/indianlist.txt
-Input filter count: 5203
-	Accepted filter count: 5203
+Input filter count: 5204
+	Accepted filter count: 5204
 	Rejected filter count: 0
-Output rule count: 5161
-	Static rules: 5161
+Output rule count: 5162
+	Static rules: 5162
 
 	Maybe good (regexes): 0
 	urlskip=: 0
@@ -660,7 +660,7 @@ Output rule count: 5161
 CSS-generic-low: 0 plain CSS selectors
 CSS-generic-high: 0 plain CSS selectors
 CSS-generic: 7 specific CSS exceptions
-CSS-specific: 4833 distinct filters for 5800 distinct hostnames
+CSS-specific: 4833 distinct filters for 5802 distinct hostnames
 CSS-procedural: 137 distinct filters for 141 distinct hostnames
 ============================
 Listset for 'irn-0':
@@ -670,8 +670,8 @@ Listset for 'irn-0':
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerTrackers.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerCensor.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerHalfPrice.txt
-	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerPhishing.txt
 	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerMalware.txt
+	Fetching remote https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlockerPhishing.txt
 Input filter count: 1349
 	Accepted filter count: 1322
 	Rejected filter count: 1

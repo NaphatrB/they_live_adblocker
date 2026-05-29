@@ -5159,5 +5159,6 @@
 {"action":{"type":"block"},"condition":{"urlFilter":"||uttarakhandlivenews.com^*/with-on-off-"},"id":5158,"priority":10},
 {"action":{"type":"block"},"condition":{"urlFilter":"||zeebharatnews.com/wp-content/uploads/2026/04/whatsapp-image-2026-04-11-at-1.41.27-pm.jpeg"},"id":5159,"priority":10},
 {"action":{"type":"allow"},"condition":{"urlFilter":"||jonmovumionline.com/advertisement_image/coffee%20promotion%20twitter%20post1710711247.gif"},"id":5160,"priority":30},
-{"action":{"type":"block"},"condition":{"urlFilter":"||moulvibazar24.com/wp-content/uploads/2026/03/138819461_695763387773256_5576275608327066523_n-300x280.jpg"},"id":5161,"priority":10}
+{"action":{"type":"block"},"condition":{"urlFilter":"||moulvibazar24.com/wp-content/uploads/2026/03/138819461_695763387773256_5576275608327066523_n-300x280.jpg"},"id":5161,"priority":10},
+{"action":{"type":"block"},"condition":{"urlFilter":"||knewsodisha.com/wp-content/uploads/2026/05/kiitadmission.jpg"},"id":5162,"priority":10}
 ]
