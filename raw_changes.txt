@@ -1,1 +1,1 @@
-- Updated uBlock filter lists and submodule
+- chore: bump uBlock submodule to prompt v5 (therapy→SLEEP fix)

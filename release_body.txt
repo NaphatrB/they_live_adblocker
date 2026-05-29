@@ -3,17 +3,17 @@
 - [Source code](https://github.com/NaphatrB/they_live_adblocker)
 - [uBlock submodule (They Live branch)](https://github.com/NaphatrB/uBlock/tree/they-live-llm)
 
-## What's new in 2026.529.1347
+## What's new in 2026.529.1415
 
-- Updated uBlock filter lists and submodule
+- chore: bump uBlock submodule to prompt v5 (therapy→SLEEP fix)
 
-- [Full commit history](https://github.com/NaphatrB/they_live_adblocker/commits/2026.529.1347)
+- [Full commit history](https://github.com/NaphatrB/they_live_adblocker/commits/2026.529.1415)
 
 ## Installation
 
 Load unpacked from the `chromium/` directory, or use the zip below:
 
-- **Chrome / Brave / Edge** — download `uBOLite_2026.529.1347.chromium.zip`, unzip, go to `chrome://extensions`, enable Developer mode, click **Load unpacked**, select the unzipped folder.
-- **Firefox** — download `uBOLite_2026.529.1347.firefox.xpi`, open `about:addons`, click the gear icon → **Install Add-on From File**.
+- **Chrome / Brave / Edge** — download `uBOLite_2026.529.1415.chromium.zip`, unzip, go to `chrome://extensions`, enable Developer mode, click **Load unpacked**, select the unzipped folder.
+- **Firefox** — download `uBOLite_2026.529.1415.firefox.xpi`, open `about:addons`, click the gear icon → **Install Add-on From File**.
 
 > AI classification (optional): enable in the extension settings with any OpenAI-compatible endpoint (Ollama local, ollama.com cloud, OpenAI, Groq, etc.).

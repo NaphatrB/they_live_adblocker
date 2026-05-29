@@ -1,5 +1,5 @@
-Secret: 8eb4f4140012478e
-Version: 2026.529.1347
+Secret: 49d31d907c597b00
+Version: 2026.529.1415
 ============================
 Listset for 'ublock-filters':
 	Fetching remote https://ublockorigin.github.io/uAssets/filters/quick-fixes.min.txt
@@ -647,11 +647,11 @@ CSS-procedural: 24 distinct filters for 19 distinct hostnames
 ============================
 Listset for 'ind-0':
 	Fetching remote https://easylist-downloads.adblockplus.org/indianlist.txt
-Input filter count: 5204
-	Accepted filter count: 5204
+Input filter count: 5203
+	Accepted filter count: 5203
 	Rejected filter count: 0
-Output rule count: 5162
-	Static rules: 5162
+Output rule count: 5161
+	Static rules: 5161
 
 	Maybe good (regexes): 0
 	urlskip=: 0
@@ -660,7 +660,7 @@ Output rule count: 5162
 CSS-generic-low: 0 plain CSS selectors
 CSS-generic-high: 0 plain CSS selectors
 CSS-generic: 7 specific CSS exceptions
-CSS-specific: 4833 distinct filters for 5802 distinct hostnames
+CSS-specific: 4834 distinct filters for 5804 distinct hostnames
 CSS-procedural: 137 distinct filters for 141 distinct hostnames
 ============================
 Listset for 'irn-0':
@@ -1123,7 +1123,7 @@ Output rule count: 1456
 CSS-generic-low: 518 plain CSS selectors
 CSS-generic-high: 26 plain CSS selectors
 CSS-generic: 113 specific CSS exceptions
-CSS-specific: 1374 distinct filters for 1212 distinct hostnames
+CSS-specific: 1375 distinct filters for 1213 distinct hostnames
 CSS-procedural: 111 distinct filters for 194 distinct hostnames
 ============================
 Listset for 'vie-1':

@@ -1,3 +1,9 @@
+### 2026.529.1415
+
+- chore: bump uBlock submodule to prompt v5 (therapy→SLEEP fix)
+
+----------
+
 ### 2026.529.1347
 
 - Updated uBlock filter lists and submodule
