@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>They Live — Test Ad Page</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #111; color: #eee; }
+        .ad-slot { border: 1px dashed #555; padding: 20px; margin: 16px 0; min-height: 80px; }
+        h2 { color: #aaa; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <h1>Test Fixture: They Live Ad Page</h1>
+    <p>This page contains fake ad slots for E2E testing the They Live extension.</p>
+
+    <!-- STREAMING: link to netflix.com → expect WATCH TV -->
+    <div id="ad-streaming" class="ad-slot" aria-label="Sponsored content">
+        <a href="https://www.netflix.com/signup">Watch Netflix Free for 30 Days</a>
+        <img alt="Netflix logo" src="">
+    </div>
+
+    <!-- RETAIL: link to amazon.com → expect CONSUME -->
+    <div id="ad-retail" class="ad-slot" aria-label="Advertisement">
+        <a href="https://www.amazon.com/deals">Shop Amazon's Best Deals</a>
+        <img alt="Amazon shopping" src="">
+    </div>
+
+    <!-- GAMING: link to steampowered.com → expect PLAY 8 HOURS -->
+    <div id="ad-gaming" class="ad-slot" data-ad-type="display">
+        <a href="https://store.steampowered.com/app/12345">Get this game on Steam!</a>
+        <img alt="Steam game promotion" src="">
+    </div>
+
+    <!-- FINANCE: link to chase.com → expect THIS IS YOUR GOD -->
+    <div id="ad-finance" class="ad-slot" aria-label="Sponsored">
+        <a href="https://www.chase.com/personal/credit-cards">Chase Sapphire Preferred Card</a>
+        <img alt="Chase credit card offer" src="">
+    </div>
+
+    <!-- NEWS: link to cnn.com → expect NO INDEPENDENT THOUGHT -->
+    <div id="ad-news" class="ad-slot">
+        <a href="https://cnn.com/subscribe">Subscribe to CNN Breaking News</a>
+        <img alt="CNN news subscription" src="">
+    </div>
+
+    <!-- DATING: link to tinder.com → expect MARRY AND REPRODUCE -->
+    <div id="ad-dating" class="ad-slot">
+        <a href="https://tinder.com/register">Find Your Match on Tinder</a>
+        <img alt="Tinder dating app" src="">
+    </div>
+
+    <!-- UNKNOWN: no recognisable link → should get random phrase or null from LLM -->
+    <div id="ad-unknown" class="ad-slot">
+        <a href="https://totally-unknown-brand.example.com/">Generic Ad</a>
+        <img alt="some product" src="">
+    </div>
+
+    <script>
+        // Expose a helper so Playwright can read classification results.
+        window.__adSlots = ['ad-streaming', 'ad-retail', 'ad-gaming', 'ad-finance', 'ad-news', 'ad-dating', 'ad-unknown'];
+        window.__getClassifications = () => {
+            const result = {};
+            for (const id of window.__adSlots) {
+                const el = document.getElementById(id);
+                if (el) result[id] = el.getAttribute('data-ubol-they-live');
+            }
+            return result;
+        };
+    </script>
+</body>
+</html>
