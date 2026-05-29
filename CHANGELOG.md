@@ -1,3 +1,16 @@
+### 2026.529.1510
+
+- chore: trigger release build
+- chore: re-trigger release after submodule push
+- docs: rewrite README with all new features
+- test: fix keyword expectations and add inter-call delay
+- fix+test: profile analysis prompt fixes and test script
+- chore: bump uBlock submodule (AI profile analysis)
+- chore: bump uBlock submodule (Your Ad Profile feature)
+- chore: bump uBlock submodule (content-script improvements)
+
+----------
+
 ### 2026.529.1432
 
 - feat: expand local fast-path rules + 42 new unit tests (91 total)

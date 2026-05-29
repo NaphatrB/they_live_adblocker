@@ -40,10 +40,28 @@ const LOADING_PHRASE = 'ANALYZING';
 const randomPhrase = () => PHRASES[Math.floor(Math.random() * PHRASES.length)];
 
 // Fetch ollamaEnabled once at startup; default false until resolved.
+// Elements tagged before settings resolve get LOADING_PHRASE and are
+// re-classified once settings arrive (avoids the startup race condition).
 let ollamaEnabled = false;
+const pendingReclassify = new Map(); // el → selector, for pre-settings ads
 if ( typeof chrome !== 'undefined' && chrome.runtime?.sendMessage ) {
     chrome.runtime.sendMessage({ what: 'getTheyLiveSettings' })
-        .then(s => { if ( s?.aiEnabled ) { ollamaEnabled = true; } })
+        .then(s => {
+            if ( s?.aiEnabled ) {
+                ollamaEnabled = true;
+                // Re-classify any ads that were tagged with randomPhrase() before
+                // we knew the LLM was enabled.
+                if ( pendingReclassify.size > 0 ) {
+                    for ( const [el, sel] of pendingReclassify ) {
+                        if ( el.isConnected ) {
+                            el.setAttribute(ATTR, LOADING_PHRASE);
+                            scheduleClassify(el, sel);
+                        }
+                    }
+                    pendingReclassify.clear();
+                }
+            }
+        })
         .catch(() => {});
 }
 
@@ -74,18 +92,70 @@ const extractAdContext = (el, selector) => {
         if ( val ) { parts.push(`[${val}]`); }
     }
 
-    // Destination link hostname
-    const link = el.querySelector('a[href]');
-    if ( link?.href ) {
-        try { parts.push(`[link:${new URL(link.href).hostname}]`); } catch { /* invalid URL */ }
+    // Ad SDK data attributes — many SDKs expose advertiser domain/name here.
+    // e.g. data-advertiser, data-sponsor, data-ad-domain, data-brand
+    for ( const attr of el.attributes ) {
+        if ( /^data-(?:advertiser|sponsor|brand|ad-domain|ad-label|ad-type)/.test(attr.name) ) {
+            const val = attr.value?.trim().slice(0, 50);
+            if ( val ) { parts.push(`[${attr.name}:${val}]`); }
+        }
     }
 
-    return parts.join(' ').slice(0, 250) || '(no content)';
+    // Destination link — prefer the first outbound link (not same-domain),
+    // falling back to the first link. Internal nav links have no advertiser signal.
+    let linkHostname = '';
+    for ( const a of el.querySelectorAll('a[href]') ) {
+        try {
+            const h = new URL(a.href).hostname;
+            if ( h && h !== location.hostname ) {
+                linkHostname = h;
+                break;
+            }
+            if ( h && !linkHostname ) { linkHostname = h; }
+        } catch { /* invalid URL */ }
+    }
+    if ( linkHostname ) { parts.push(`[link:${linkHostname}]`); }
+
+    return parts.join(' ').slice(0, 300) || '(no content)';
 };
 
 // Batch elements for a single deferred LLM classify call.
 const classifyQueue = [];
 let classifyTimer = null;
+
+// Profile signals — fire-and-forget side channel for retargeting/DC param tracking.
+// These are sent independently so they don't block or delay classification.
+const profileBatch = [];
+let profileTimer = null;
+
+const flushProfileBatch = () => {
+    profileTimer = null;
+    const batch = profileBatch.splice(0);
+    if ( batch.length === 0 || typeof chrome === 'undefined' || !chrome.runtime?.sendMessage ) { return; }
+    for ( const sig of batch ) {
+        chrome.runtime.sendMessage({ what: 'theyLiveProfileSignal', ...sig }).catch(() => {});
+    }
+};
+
+const scheduleProfileSignal = (signal) => {
+    profileBatch.push(signal);
+    if ( !profileTimer ) { profileTimer = (self.setTimeout || setTimeout)(flushProfileBatch, 2000); }
+};
+
+// Extract Google/DoubleClick cust_params from ad slot iframes.
+// Returns decoded key-value string (e.g. "age=25-34&interests=travel") or null.
+const extractDcParams = (el) => {
+    for ( const iframe of el.querySelectorAll('iframe[src]') ) {
+        try {
+            const url = new URL(iframe.src);
+            if ( /doubleclick\.net|googlesyndication\.com|googleadservices\.com/.test(url.hostname) ) {
+                const cp = url.searchParams.get('cust_params');
+                if ( cp ) { return decodeURIComponent(cp).slice(0, 200); }
+            }
+        } catch { /* malformed URL */ }
+    }
+    return null;
+};
 
 const flushClassifyQueue = () => {
     classifyTimer = null;
@@ -123,6 +193,11 @@ const flushClassifyQueue = () => {
 
 const enqueueClassify = (el, selector) => {
     classifyQueue.push({ el, context: extractAdContext(el, selector) });
+
+    // Fire-and-forget: send Google/DC targeting params to background if present.
+    const dcParams = extractDcParams(el);
+    if ( dcParams ) { scheduleProfileSignal({ page: location.hostname, dcParams }); }
+
     if ( classifyTimer !== null ) { return; }
     // 400ms debounce: long pages load many ads in bursts; batching more
     // together reduces total API calls with no perceptible UX cost.
@@ -272,6 +347,8 @@ const tagAll = () => {
                 scheduleClassify(el, selector);
             } else {
                 el.setAttribute(ATTR, randomPhrase());
+                // Track for re-classification if LLM becomes enabled shortly after.
+                pendingReclassify.set(el, selector);
             }
             tagged += 1;
         }

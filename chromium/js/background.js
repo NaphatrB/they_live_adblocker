@@ -266,6 +266,17 @@ const CLASSIFY_SYSTEM_PROMPT = [
     'Rules: exact label text only, one per line, no extra text, no numbering.',
 ].join('\n');
 
+// System prompt for AI profile analysis — separate from per-ad classification.
+// Asks the LLM to interpret aggregated session data as a data-broker profile.
+const PROFILE_ANALYSIS_SYSTEM_PROMPT = [
+    'You are an expert in programmatic advertising, real-time bidding, and data broker audience profiles.',
+    'A browser extension has collected ad targeting data from a real browsing session.',
+    'Analyse the data and explain — specifically and bluntly — what the advertising industry believes about this person.',
+    'Write 4-6 punchy bullet points. Focus on what the data *implies* (income bracket, life stage, purchase intent, segment value) rather than just restating numbers.',
+    'Adopt a slightly sardonic tone, as if explaining the matrix to someone who just put on the glasses from the film "They Live".',
+    'Keep your total response under 220 words. Use plain bullet points (• ), no headers.',
+].join('\n');
+
 // In-memory classification cache (context hash → phrase).
 // Persisted to chrome.storage.local under 'theyLiveCache'.
 const CACHE_MAX_SIZE = 1000;
@@ -281,8 +292,52 @@ const CLASSIFY_LOG_MAX = 200;
 const classifyLog = [];
 const phraseFreq = {};
 
+// Advertiser frequency map: domain → { count, pages: Set<string> }
+// Built incrementally as ads are classified; used for retargeting detection.
+const advertiserFreq = new Map();
+
+// Raw ad-platform targeting params (Google/DoubleClick cust_params) from content script.
+const customParamLog = [];
+const CUSTOM_PARAM_MAX = 50;
+
+// Phrases mapped to broker-side interest segment labels (shown in "Your Ad Profile").
+// Must cover every entry in THEY_LIVE_PHRASES (they-live-classify.js).
+const PHRASE_TRAITS = {
+    'CONSUME':                   'Online shopper / retail interest',
+    'BUY':                       'In-market buyer (active purchase intent)',
+    'WORK':                      'Career / B2B / professional services',
+    'WORK 8 HOURS':              'Job-seeker / recruitment target',
+    'THIS IS YOUR GOD':          'Homeowner · financially active · insured',
+    'NO INDEPENDENT THOUGHT':    'News & current affairs reader',
+    'WATCH TV':                  'Streaming / entertainment consumer',
+    'PLAY 8 HOURS':              'Gamer',
+    'SLEEP':                     'Wellness / mental health interest',
+    'CONFORM':                   'Beauty & lifestyle consumer',
+    'OBEY':                      'General audience (low targeting precision)',
+    'SUBMIT':                    'Email / newsletter marketing target',
+    'HONOR APATHY':              'Social media & influencer marketing target',
+    'NO IDEAS':                  'SaaS / business software prospect',
+    'NO IMAGINATION':            'Creative software / design tools prospect',
+    'MARRY AND REPRODUCE':       'Dating / family / relationship interest',
+    'DO NOT QUESTION AUTHORITY': 'Government / legal / civic content target',
+    'STAY ASLEEP':               'Passive / ambient media consumer',
+};
+
 const logClassification = (ctx, phrase, source) => {
     if ( phrase ) { phraseFreq[phrase] = (phraseFreq[phrase] || 0) + 1; }
+
+    // Track advertiser domain frequency for retargeting detection.
+    const linkMatch = ctx.match(/\[link:([^\]\s]+)\]/);
+    if ( linkMatch ) {
+        const domain = linkMatch[1];
+        const pageMatch = ctx.match(/\[page:([^\]\s]+)\]/);
+        const page = pageMatch?.[1] || '';
+        let entry = advertiserFreq.get(domain);
+        if ( !entry ) { entry = { count: 0, pages: new Set() }; advertiserFreq.set(domain, entry); }
+        entry.count++;
+        if ( page ) { entry.pages.add(page); }
+    }
+
     if ( source === 'cache' || !phrase ) { return; }
     if ( classifyLog.length >= CLASSIFY_LOG_MAX ) { classifyLog.shift(); }
     classifyLog.push({ ts: Date.now(), source, phrase, ctx });
@@ -561,6 +616,137 @@ function onMessage(request, sender, callback) {
     case 'getTheyLiveLog': {
         callback({ log: classifyLog.slice() });
         return false;
+    }
+
+    case 'theyLiveProfileSignal': {
+        // Decoded Google/DoubleClick cust_params forwarded from the content script.
+        if ( request.dcParams ) {
+            if ( customParamLog.length >= CUSTOM_PARAM_MAX ) { customParamLog.shift(); }
+            customParamLog.push({ ts: Date.now(), page: request.page || '', params: request.dcParams });
+        }
+        callback();
+        return false;
+    }
+
+    case 'getTheyLiveProfile': {
+        const totalAds = Object.values(phraseFreq).reduce((n, c) => n + c, 0);
+
+        const interests = Object.entries(phraseFreq)
+            .filter(([p]) => PHRASE_TRAITS[p])
+            .map(([p, count]) => ({
+                phrase: p,
+                trait: PHRASE_TRAITS[p],
+                count,
+                pct: totalAds > 0 ? Math.round(count / totalAds * 100) : 0,
+            }))
+            .sort((a, b) => b.count - a.count);
+
+        const retargeters = [...advertiserFreq.entries()]
+            .map(([domain, e]) => ({ domain, count: e.count, pageCount: e.pages.size }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 15);
+
+        // Profile intensity score 0–10: breadth of interests + retargeting depth.
+        const retargetingDepth = retargeters.filter(r => r.count >= 3).length;
+        const profileScore = Math.min(10, Math.round(interests.length * 0.8 + retargetingDepth * 1.2));
+
+        callback({ interests, retargeters, customParams: customParamLog.slice(), profileScore, totalAds });
+        return false;
+    }
+
+    case 'theyLiveAnalyseProfile': {
+        // Use the configured LLM to generate a natural-language profile analysis.
+        (async () => {
+            const [enabled, url, model, apiKey, thinking] = await Promise.all([
+                localRead('theyLive.aiEnabled'),
+                localRead('theyLive.aiBaseUrl'),
+                localRead('theyLive.aiModel'),
+                localRead('theyLive.aiApiKey'),
+                localRead('theyLive.aiThinking'),
+            ]);
+            if ( !enabled ) {
+                callback({ error: 'AI is not enabled. Configure it in the Settings tab.' });
+                return;
+            }
+
+            const totalAds = Object.values(phraseFreq).reduce((n, c) => n + c, 0);
+            if ( totalAds === 0 ) {
+                callback({ error: 'No ad data yet. Browse some pages first.' });
+                return;
+            }
+
+            // Build a structured plaintext summary of the profile data.
+            const interests = Object.entries(phraseFreq)
+                .filter(([p]) => PHRASE_TRAITS[p])
+                .map(([p, count]) => `- ${PHRASE_TRAITS[p]}: ${count} ads (${Math.round(count / totalAds * 100)}%)`)
+                .join('\n');
+
+            const retargeters = [...advertiserFreq.entries()]
+                .map(([domain, e]) => ({ domain, count: e.count, pageCount: e.pages.size }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 10);
+
+            const retargetLines = retargeters.length > 0
+                ? retargeters.map(r => `- ${r.domain}: seen ${r.count}× across ${r.pageCount} site(s)`).join('\n')
+                : '- None detected this session';
+
+            const dcLines = customParamLog.length > 0
+                ? customParamLog.slice(-5).map(c => `- [${c.page}] ${c.params}`).join('\n')
+                : '';
+
+            const userContent = [
+                'AD CATEGORIES SEEN (by frequency):',
+                interests,
+                '',
+                'RETARGETING TRACKERS (advertisers following across multiple sites):',
+                retargetLines,
+                ...(dcLines ? ['', 'RAW TARGETING DATA (decoded from Google/DoubleClick):', dcLines] : []),
+                '',
+                'What does this targeting data reveal about how the advertising industry has profiled this user?',
+            ].join('\n');
+
+            const baseUrl = (url || 'https://ollama.com').replace(/\/$/, '');
+            const aiModel = model || 'gemma4:31b-cloud';
+            const headers = { 'Content-Type': 'application/json' };
+            if ( apiKey ) { headers['Authorization'] = `Bearer ${apiKey}`; }
+
+            let response;
+            try {
+                response = await fetch(`${baseUrl}/v1/chat/completions`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        model: aiModel,
+                        messages: [
+                            { role: 'system', content: PROFILE_ANALYSIS_SYSTEM_PROMPT },
+                            { role: 'user', content: userContent },
+                        ],
+                        stream: false,
+                        ...(thinking ? { think: true } : {}),
+                    }),
+                    signal: AbortSignal.timeout(30000),
+                });
+            } catch(reason) {
+                callback({ error: `LLM request failed: ${reason}` });
+                return;
+            }
+
+            if ( !response.ok ) {
+                callback({ error: `LLM returned HTTP ${response.status}` });
+                return;
+            }
+
+            let data;
+            try { data = await response.json(); } catch(reason) {
+                callback({ error: `LLM response parse failed: ${reason}` });
+                return;
+            }
+
+            let analysis = data.choices?.[0]?.message?.content || '';
+            analysis = analysis.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+            callback({ analysis });
+        })();
+        return true; // async
     }
 
     case 'startCustomFilters':
