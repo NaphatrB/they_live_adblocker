@@ -1,1 +1,1 @@
-- fix: analyse-with-AI silent failure, empty response hang, 60s timeout
+- Updated uBlock filter lists and submodule

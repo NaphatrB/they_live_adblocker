@@ -1,3 +1,9 @@
+### 2026.529.1530
+
+- Updated uBlock filter lists and submodule
+
+----------
+
 ### 2026.529.1524
 
 - fix: analyse-with-AI silent failure, empty response hang, 60s timeout
