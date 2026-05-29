@@ -1,7 +1,7 @@
 [submodule "uBlock"]
 	path = uBlock
-	url = https://github.com/davmlaw/uBlock.git
-	branch = they-live
+	url = https://github.com/NaphatrB/uBlock.git
+	branch = they-live-llm
 [submodule "publish-extension"]
 	path = publish-extension
 	url = https://github.com/gorhill/publish-extension.git
