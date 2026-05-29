@@ -1,6 +1,14 @@
 name: uBO Lite release
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.github/**'
 
 permissions:
   contents: read
