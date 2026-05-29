@@ -51,6 +51,14 @@ Download the latest **`uBOLite_theylive.chromium.zip`** from the [Releases page]
 
 Keep the folder around — the extension is loaded from that path.
 
+### Firefox
+
+1. Go to `about:debugging` → **This Firefox**
+2. Click **Load Temporary Add-on…**
+3. Select the `manifest.json` inside the extracted folder
+
+> The extension stays loaded until Firefox restarts. Re-load it from `about:debugging` after any changes.
+
 ### Make it actually replace ads
 
 By default uBO Lite uses **Basic** filtering mode, which blocks ads at the network layer. Network-blocked ads never produce a DOM element, so there's nothing to "they-live-ify" — you just get empty space, as with normal uBO Lite. To see the OBEY tiles:
@@ -64,13 +72,14 @@ By default uBO Lite uses **Basic** filtering mode, which blocks ads at the netwo
 Requires Node 22.
 
 ```bash
-git clone --recursive https://github.com/davmlaw/they_live_adblocker
+git clone --recursive https://github.com/NaphatrB/they_live_adblocker
 cd they_live_adblocker/uBlock
 nvm use 22                       # or otherwise ensure Node >= 22
-tools/make-mv3.sh chromium       # or: firefox | edge | safari
+tools/make-mv3.sh chromium       # builds to uBlock/dist/build/uBOLite.chromium/
+tools/make-mv3.sh firefox        # builds to uBlock/dist/build/uBOLite.firefox/
 ```
 
-The packaged extension lands in `uBlock/dist/build/uBOLite.chromium/` — load it as an unpacked extension.
+Load the output folder as an unpacked/temporary extension as described above.
 
 ## How it works
 
@@ -80,7 +89,7 @@ On hover the `::after` overlay is hidden and the element background becomes tran
 
 When AI classification is enabled, element context (class names, nearby text, `alt` attributes) is batched and sent to an Ollama-compatible API endpoint; the returned phrase replaces the initial random one once the response arrives.
 
-Touched files in the [`davmlaw/uBlock`](https://github.com/davmlaw/uBlock/tree/they-live-llm) submodule:
+Touched files in the [`NaphatrB/uBlock`](https://github.com/NaphatrB/uBlock/tree/they-live-llm) submodule:
 
 - `platform/mv3/extension/js/scripting/they-live.js` *(new)* — phrase list, CSS generator (including hover rules), DOM tagging, LLM batch queue
 - `platform/mv3/extension/js/scripting/css-{specific,generic,procedural-api}.js` — call sites
