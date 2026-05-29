@@ -319,3 +319,178 @@ describe('localClassify — null for unknown context', () => {
         assert.equal(localClassify(ctx({ text: 'Generic promotional message xyz123' })), null);
     });
 });
+
+// ---------------------------------------------------------------------------
+// 10. Insurance bug fix: insurance companies → THIS IS YOUR GOD (not WORK)
+// ---------------------------------------------------------------------------
+
+describe('insurance domain rules — THIS IS YOUR GOD', () => {
+    test('progressive link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'progressive.com' })), 'THIS IS YOUR GOD');
+    });
+    test('geico link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'geico.com' })), 'THIS IS YOUR GOD');
+    });
+    test('allstate link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'allstate.com' })), 'THIS IS YOUR GOD');
+    });
+    test('statefarm link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'statefarm.com' })), 'THIS IS YOUR GOD');
+    });
+    test('comparethemarket link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'comparethemarket.com' })), 'THIS IS YOUR GOD');
+    });
+    test('moneysupermarket link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'moneysupermarket.com' })), 'THIS IS YOUR GOD');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// 11. Real estate / mortgage domain rules → THIS IS YOUR GOD
+// ---------------------------------------------------------------------------
+
+describe('real estate & mortgage domain rules', () => {
+    test('rightmove link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'rightmove.co.uk' })), 'THIS IS YOUR GOD');
+    });
+    test('zoopla link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'zoopla.co.uk' })), 'THIS IS YOUR GOD');
+    });
+    test('zillow link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'zillow.com' })), 'THIS IS YOUR GOD');
+    });
+    test('habito link → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ link: 'habito.com' })), 'THIS IS YOUR GOD');
+    });
+    test('"mortgage" keyword text → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ text: 'Best mortgage rates 2024' })), 'THIS IS YOUR GOD');
+    });
+    test('"real estate" keyword text → THIS IS YOUR GOD', () => {
+        assert.equal(localClassify(ctx({ text: 'UK real estate investment' })), 'THIS IS YOUR GOD');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// 12. Travel domain rules → CONSUME
+// ---------------------------------------------------------------------------
+
+describe('travel domain rules', () => {
+    test('booking link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'booking.com' })), 'CONSUME');
+    });
+    test('expedia link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'expedia.com' })), 'CONSUME');
+    });
+    test('airbnb link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'airbnb.com' })), 'CONSUME');
+    });
+    test('skyscanner link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'skyscanner.net' })), 'CONSUME');
+    });
+    test('easyjet link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'easyjet.com' })), 'CONSUME');
+    });
+    test('tripadvisor link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'tripadvisor.com' })), 'CONSUME');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// 13. Food delivery domain rules → CONSUME
+// ---------------------------------------------------------------------------
+
+describe('food delivery domain rules', () => {
+    test('deliveroo link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'deliveroo.co.uk' })), 'CONSUME');
+    });
+    test('ubereats link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'ubereats.com' })), 'CONSUME');
+    });
+    test('doordash link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'doordash.com' })), 'CONSUME');
+    });
+    test('hellofresh link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'hellofresh.co.uk' })), 'CONSUME');
+    });
+    test('justeat link → CONSUME', () => {
+        assert.equal(localClassify(ctx({ link: 'justeat.co.uk' })), 'CONSUME');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// 14. Sleep / therapy domain & keyword rules → SLEEP
+// ---------------------------------------------------------------------------
+
+describe('sleep & therapy rules', () => {
+    test('betterhelp link → SLEEP', () => {
+        assert.equal(localClassify(ctx({ link: 'betterhelp.com' })), 'SLEEP');
+    });
+    test('calm link → SLEEP', () => {
+        assert.equal(localClassify(ctx({ link: 'calm.com' })), 'SLEEP');
+    });
+    test('headspace link → SLEEP', () => {
+        assert.equal(localClassify(ctx({ link: 'headspace.com' })), 'SLEEP');
+    });
+    test('talkspace link → SLEEP', () => {
+        assert.equal(localClassify(ctx({ link: 'talkspace.com' })), 'SLEEP');
+    });
+    test('"therapy" keyword → SLEEP', () => {
+        assert.equal(localClassify(ctx({ text: 'Talk to a therapist online today' })), 'SLEEP');
+    });
+    test('"mental health" keyword → SLEEP', () => {
+        assert.equal(localClassify(ctx({ text: 'Mental health support anytime' })), 'SLEEP');
+    });
+    test('"meditation" keyword → SLEEP', () => {
+        assert.equal(localClassify(ctx({ text: 'Start meditating in 5 minutes' })), 'SLEEP');
+    });
+    test('"counselling" keyword → SLEEP', () => {
+        assert.equal(localClassify(ctx({ text: 'Free online counselling sessions' })), 'SLEEP');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// 15. Health/wellness keyword rules → CONFORM
+// ---------------------------------------------------------------------------
+
+describe('health & wellness keyword rules', () => {
+    test('"supplement" keyword → CONFORM', () => {
+        assert.equal(localClassify(ctx({ text: 'Daily vitamin supplement for energy' })), 'CONFORM');
+    });
+    test('"vitamin" keyword → CONFORM', () => {
+        assert.equal(localClassify(ctx({ text: 'Vitamin D3 1000IU high strength' })), 'CONFORM');
+    });
+    test('"weight loss" keyword → CONFORM', () => {
+        assert.equal(localClassify(ctx({ text: 'Doctor-backed weight loss programme' })), 'CONFORM');
+    });
+    test('noom link → CONFORM', () => {
+        assert.equal(localClassify(ctx({ link: 'noom.com' })), 'CONFORM');
+    });
+    test('hollandandbarrett link → CONFORM', () => {
+        assert.equal(localClassify(ctx({ link: 'hollandandbarrett.com' })), 'CONFORM');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// 16. Mobile game studio domain rules → PLAY 8 HOURS
+// ---------------------------------------------------------------------------
+
+describe('mobile game studio domain rules', () => {
+    test('supercell (Clash of Clans) link → PLAY 8 HOURS', () => {
+        assert.equal(localClassify(ctx({ link: 'supercell.com' })), 'PLAY 8 HOURS');
+    });
+    test('plarium (RAID) link → PLAY 8 HOURS', () => {
+        assert.equal(localClassify(ctx({ link: 'plarium.com' })), 'PLAY 8 HOURS');
+    });
+    test('scopely (Monopoly Go) link → PLAY 8 HOURS', () => {
+        assert.equal(localClassify(ctx({ link: 'scopely.com' })), 'PLAY 8 HOURS');
+    });
+    test('zynga link → PLAY 8 HOURS', () => {
+        assert.equal(localClassify(ctx({ link: 'zynga.com' })), 'PLAY 8 HOURS');
+    });
+    test('niantic (Pokemon Go) link → PLAY 8 HOURS', () => {
+        assert.equal(localClassify(ctx({ link: 'nianticlabs.com' })), 'PLAY 8 HOURS');
+    });
+    test('activision link → PLAY 8 HOURS', () => {
+        assert.equal(localClassify(ctx({ link: 'activision.com' })), 'PLAY 8 HOURS');
+    });
+});
