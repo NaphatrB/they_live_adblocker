@@ -139,7 +139,14 @@ const flushProfileBatch = () => {
 
 const scheduleProfileSignal = (signal) => {
     profileBatch.push(signal);
-    if ( !profileTimer ) { profileTimer = (self.setTimeout || setTimeout)(flushProfileBatch, 2000); }
+    if ( !profileTimer ) {
+        if (self.setTimeout) {
+            profileTimer = self.setTimeout(flushProfileBatch, 2000);
+        }
+        else {
+            profileTimer = setTimeout(flushProfileBatch, 2000);
+        }
+    }
 };
 
 // Extract Google/DoubleClick cust_params from ad slot iframes.
@@ -201,7 +208,12 @@ const enqueueClassify = (el, selector) => {
     if ( classifyTimer !== null ) { return; }
     // 400ms debounce: long pages load many ads in bursts; batching more
     // together reduces total API calls with no perceptible UX cost.
-    classifyTimer = (self.setTimeout || setTimeout)(flushClassifyQueue, 400);
+    if ( self.setTimeout ) {
+        classifyTimer = self.setTimeout(flushClassifyQueue, 400);
+    }
+    else {
+        classifyTimer = setTimeout(flushClassifyQueue, 400);
+    }
 };
 
 // Defer classification until the ad slot actually enters the viewport.
@@ -361,7 +373,11 @@ const tagAll = () => {
 const scheduleTag = () => {
     if ( pendingTag ) { return; }
     pendingTag = true;
-    (self.requestAnimationFrame || self.setTimeout)(tagAll, 16);
+    if ( self.requestAnimationFrame ) {
+        self.requestAnimationFrame(tagAll);
+    } else {
+        self.setTimeout(tagAll, 16);
+    }
 };
 
 self.theyLiveAssign = function(selectorList) {
